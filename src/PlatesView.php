@@ -16,4 +16,27 @@ final class PlatesView implements ViewInterface
     {
         return $this->engine->render($viewName, $data);
     }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function renderString(string $template, array $data = []): string
+    {
+        $name = '__string_' . bin2hex(random_bytes(16));
+        $path = rtrim($this->engine->getDirectory(), DIRECTORY_SEPARATOR)
+            . DIRECTORY_SEPARATOR
+            . $name
+            . '.'
+            . $this->engine->getFileExtension();
+
+        try {
+            file_put_contents($path, $template);
+
+            return $this->engine->render($name, $data);
+        } finally {
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
+    }
 }
